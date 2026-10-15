@@ -1,0 +1,66 @@
+name: CI Android - Build
+on:
+  workflow_dispatch:
+jobs:
+  build-android:
+    name: Build Android APK
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.44.6'
+          cache: true
+
+      - name: Set up Java with Gradle cache
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: gradle
+
+      - name: Resolve Android SDK versions
+        id: android-sdk
+        run: |
+          NDK_VERSION=$(sed -n 's/.*ndkVersion = "\([^"]*\)".*/\1/p' android/app/build.gradle.kts | head -n 1)
+          if [ -z "$NDK_VERSION" ]; then
+            echo "Could not resolve ndkVersion from android/app/build.gradle.kts" >&2
+            exit 1
+          fi
+          echo "ndk-version=$NDK_VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Cache Android SDK components
+        uses: actions/cache@v4
+        with:
+          path: |
+            /usr/local/lib/android/sdk/ndk/${{ steps.android-sdk.outputs.ndk-version }}
+            /usr/local/lib/android/sdk/platforms
+          key: ${{ runner.os }}-android-sdk-${{ steps.android-sdk.outputs.ndk-version }}-${{ hashFiles('android/**/*.gradle', 'android/**/*.gradle.kts', 'android/gradle.properties', 'android/settings.gradle.kts') }}
+          restore-keys: |
+            ${{ runner.os }}-android-sdk-${{ steps.android-sdk.outputs.ndk-version }}-
+
+      - name: Install Android SDK components
+        run: |
+          "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" "ndk;${{ steps.android-sdk.outputs.ndk-version }}" "platforms;android-33"
+
+      - name: Cache Flutter dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.pub-cache
+          key: ${{ runner.os }}-flutter-pub-${{ hashFiles('**/pubspec.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-flutter-pub-
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Create .env file for flutter_dotenv
+        run: |
+          echo "API_BASE_URL=${{ secrets.API_BASE_URL }}" > .env
+
+      - name: Build Android APK debug
+        run: flutter build apk --debug --no-pub --target-platform android-arm64 --no-track-widget-creation

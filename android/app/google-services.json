@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "304362969930",
+    "project_id": "dineroo-b329f",
+    "storage_bucket": "dineroo-b329f.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:304362969930:android:52183f3fb7670a61d83fb3",
+        "android_client_info": {
+          "package_name": "com.dineroo.app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCziGNF6PwNCUOrfleQYsiqV-2-_vPscAM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

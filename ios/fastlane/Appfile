@@ -1,0 +1,4 @@
+# Dineroo Bundle ID
+app_identifier("com.dineroo.app")
+# Dineroo team ID
+team_id("26G99557B5")

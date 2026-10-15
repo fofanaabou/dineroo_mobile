@@ -1,0 +1,82 @@
+workflows:
+  ios-testflight:
+    name: iOS TestFlight
+    max_build_duration: 60
+    instance_type: mac_mini_m2
+    triggering:
+      events: []
+    environment:
+      flutter: 3.35.7
+      xcode: latest
+      cocoapods: default
+      ruby: 3.3.6
+      groups:
+        - ios_credentials
+      vars:
+        BUNDLE_ID: com.dineroo.app
+        TEAM_ID: 26G99557B5
+    scripts:
+      - name: Create .env file
+        script: |
+          echo "API_BASE_URL=$API_BASE_URL" > .env
+
+      - name: Configure git for Match
+        script: |
+          git config --global \
+            url."https://x-access-token:$MATCH_GIT_TOKEN@github.com/".insteadOf \
+            "https://github.com/"
+
+      - name: Bump build number
+        script: |
+          git config user.name "codemagic-bot"
+          git config user.email "codemagic-bot@users.noreply.github.com"
+          git pull --rebase origin main
+          FILE=pubspec.yaml
+          LINE=$(grep -E "^version:" "$FILE" | head -n 1)
+          VERSION=$(echo "$LINE" | sed -E 's/version:[[:space:]]*([0-9]+\.[0-9]+\.[0-9]+)\+([0-9]+)/\1/')
+          BUILD=$(echo "$LINE" | sed -E 's/version:[[:space:]]*([0-9]+\.[0-9]+\.[0-9]+)\+([0-9]+)/\2/')
+          NEW_BUILD=$((BUILD + 1))
+          echo "Bumping build: $VERSION+$BUILD → $VERSION+$NEW_BUILD"
+          perl -i -pe "s/^version:\s*.*/version: $VERSION+$NEW_BUILD/" "$FILE"
+          git add pubspec.yaml
+          git commit -m "chore: bump iOS build to $NEW_BUILD ($VERSION)"
+          git remote set-url origin "https://x-access-token:$MATCH_GIT_TOKEN@github.com/dineroo-gn/dineroo_mobile.git"
+          git push origin HEAD
+
+      - name: Flutter pub get
+        script: flutter pub get
+
+      - name: Install iOS gems
+        script: |
+          cd ios
+          bundle update fastlane
+          bundle install
+
+      - name: Install CocoaPods
+        script: |
+          cd ios
+          bundle exec pod install --repo-update
+
+      - name: Build & Upload to TestFlight
+        script: |
+          cd ios
+          bundle exec fastlane beta
+
+    artifacts:
+      - ios/Runner.ipa
+      - ios/Runner.app.dSYM.zip
+      - /tmp/xcodebuild_logs/*.log
+
+    publishing:
+      app_store_connect:
+        api_key: $APPSTORE_PRIVATE_KEY
+        key_id: $APPSTORE_KEY_ID
+        issuer_id: $APPSTORE_ISSUER_ID
+        submit_to_testflight: true
+        expire_build_submitted_for_review: false
+      email:
+        recipients:
+          - kemokoconde13@gmail.com
+        notify:
+          success: true
+          failure: true

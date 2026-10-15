@@ -1,0 +1,4 @@
+enum CheckoutPaymentMethod {
+  wallet,
+  djomy,
+}

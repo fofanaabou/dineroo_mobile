@@ -1,0 +1,73 @@
+name: CD Android - Build & Deploy
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: cd-android
+  cancel-in-progress: false
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Create .env file
+        run: |
+          echo "API_BASE_URL=${{ secrets.API_BASE_URL }}" > .env
+
+      - name: Install Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.44.6"
+          channel: "stable"
+
+      - name: Flutter pub get
+        run: flutter pub get
+
+      - name: Decode Keystore
+        run: |
+          echo "${{ secrets.ANDROID_KEYSTORE }}" | base64 --decode > android/app/dineroo-release-key.jks
+
+      - name: Set up key.properties
+        run: |
+          printf 'storePassword=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}\nkeyPassword=${{ secrets.ANDROID_KEY_PASSWORD }}\nkeyAlias=${{ secrets.ANDROID_KEY_ALIAS }}\nstoreFile=dineroo-release-key.jks\n' > android/key.properties
+
+      - name: Fetch latest versionCode from Play Store
+        id: play_version
+        env:
+          PLAY_API_JSON: ${{ secrets.PLAY_API_JSON }}
+        run: |
+          pip install --quiet google-api-python-client google-auth
+          python3 .github/scripts/fetch_play_store_version_code.py >> "$GITHUB_OUTPUT"
+
+      - name: Set version code
+        id: app_version
+        run: |
+          PUBSPEC_LINE=$(grep -E "^version:" pubspec.yaml | head -n 1)
+          VERSION_NAME=$(echo "$PUBSPEC_LINE" | sed -E 's/version:[[:space:]]*([0-9]+\.[0-9]+\.[0-9]+)\+([0-9]+)/\1/')
+
+          NEW_VERSION_CODE=$(( ${{ steps.play_version.outputs.latest_version_code }} + 1 ))
+
+          FILE=android/app/version.properties
+          echo "VERSION_CODE=$NEW_VERSION_CODE" > "$FILE"
+          echo "VERSION_NAME=$VERSION_NAME" >> "$FILE"
+
+          echo "version_code=$NEW_VERSION_CODE" >> $GITHUB_OUTPUT
+          echo "version_name=$VERSION_NAME" >> $GITHUB_OUTPUT
+
+      - name: Build App Bundle
+        run: flutter build appbundle --release
+
+      - name: Upload to Play Store
+        uses: r0adkll/upload-google-play@v1.1.3
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.PLAY_API_JSON }}
+          packageName: "com.dineroo.app"
+          releaseFiles: build/app/outputs/bundle/release/app-release.aab
+          track: internal
+          status: completed
+          releaseName: "${{ steps.app_version.outputs.version_name }} (${{ steps.app_version.outputs.version_code }})"

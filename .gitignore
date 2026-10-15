@@ -1,0 +1,127 @@
+##############################
+# ENV & SECRETS
+##############################
+.env
+.env.production
+.env.*              # AJOUT (ex: .env.staging)
+key.properties
+**/*.jks
+**/*.keystore
+android/app/version.properties
+
+##############################
+# Miscellaneous
+##############################
+*.class
+*.log
+*.pyc
+*.swp
+.DS_Store
+.atom/
+.build/
+.buildlog/
+.history
+.svn/
+.swiftpm/
+migrate_working_dir/
+
+##############################
+# IDE / Project files
+##############################
+*.iml
+*.ipr
+*.iws
+.idea/
+.cloudflared-*
+
+# VS Code (uncomment if needed)
+#.vscode/
+
+##############################
+# Flutter / Dart / Pub
+##############################
+**/doc/api/
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+build/
+generated_plugin_registrant.dart
+
+##############################
+# iOS / Xcode
+##############################
+ios/Flutter/.last_build_id
+ios/Flutter/Flutter.framework
+ios/Flutter/App.framework
+ios/Flutter/Flutter.podspec
+ios/Flutter/ephemeral/            # AJOUT
+ios/.symlinks/                    # AJOUT
+ios/Runner/GeneratedPluginRegistrant.*
+**/Pods/
+**/Podfile.lock
+
+# Xcode local build artifacts (AJOUT)
+**/DerivedData/
+**/*.xcworkspace/xcuserdata/
+**/*.xcodeproj/xcuserdata/
+**/*.xcodeproj/project.xcworkspace/xcuserdata/
+**/*.xcuserstate
+**/*.xcscmblueprint
+
+# Archives / exports (AJOUT)
+**/*.xcarchive
+**/*.ipa
+**/*.dSYM.zip
+**/*.dSYM
+
+##############################
+# Ruby / Bundler / Fastlane (AJOUT)
+##############################
+vendor/
+ios/vendor/
+.bundle/
+ios/.bundle/
+*.gem
+.bundle/cache/
+ios/vendor/bundle/
+
+##############################
+# Android
+##############################
+android/local.properties
+android/.gradle/
+android/app/debug
+android/app/profile
+android/app/release
+.cxx/
+gradle-wrapper.jar
+/.gradle
+/captures/
+/gradlew
+/gradlew.bat
+/local.properties
+GeneratedPluginRegistrant.java
+
+# symbolication / mapping
+app.*.symbols
+app.*.map.json
+
+##############################
+# macOS
+##############################
+macos/Flutter/GeneratedPluginRegistrant.swift
+
+##############################
+# Tests & Build artifacts
+##############################
+coverage/
+*.cmake
+*.cc
+
+keystore.b64
+
+# Local commit-message scratch file
+message-commit.md

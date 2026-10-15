@@ -1,0 +1,104 @@
+name: dineroo_mobile
+description: "App for meal delivery in Guinea"
+
+publish_to: 'none'
+version: 1.0.0+49
+
+environment:
+  sdk: ^3.9.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  audioplayers: ^5.2.0
+  firebase_core: 3.4.1
+  firebase_messaging: 15.1.0
+  flutter_localizations:
+    sdk: flutter
+  file_picker: 10.1.9
+  flutter_verification_code: ^1.1.7
+  flutter_dotenv: ^5.1.0
+  logger: ^2.0.2
+  cached_network_image: ^3.3.1
+  connectivity_plus: ^6.1.4
+  cupertino_icons: ^1.0.8
+  geolocator: ^14.0.0
+  image_picker: ^1.1.2
+  intl: ^0.20.2
+  provider: ^6.1.1
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+  path_provider: ^2.1.2
+  flutter_map: ^8.1.1
+  flutter_local_notifications: ^17.2.3
+  latlong2: ^0.9.0
+  dotted_border: ^2.0.0
+  jwt_decoder: ^2.0.1
+  mask_text_input_formatter: ^2.4.0
+  fluttertoast: ^8.2.2
+  url_launcher: ^6.3.2
+  dio: ^5.8.0+1
+  # Observability (Phase 4b): crashes/errors -> GlitchTip, traces -> Alloy/Tempo.
+  sentry_flutter: ^9.30.1
+  opentelemetry: ^0.18.11
+  stomp_dart_client: ^2.1.3
+  in_app_update: ^4.2.3
+  package_info_plus: ^8.3.1
+  webview_flutter: ">=4.2.0 <4.3.0"
+  flutter_pdfview: ^1.3.2
+  wakelock_plus: ^1.2.8
+
+dependency_overrides:
+  webview_flutter_wkwebview: 3.9.4
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+  flutter_launcher_icons: ^0.14.3
+  flutter_native_splash: ^2.3.5
+  hive_generator: ^2.0.1
+  build_runner: ^2.4.6
+
+flutter:
+  assets:
+    - .env
+    - assets/images/app_icon.png
+    - assets/images/app_splash_screen.png
+    - assets/images/order_placed_image.png
+    - assets/images/app_add_file.png
+    - assets/images/app_cloche_icon.png
+    - assets/images/app_withdraw.png
+    - assets/images/app_spinner.png
+    - assets/images/support.png
+    - assets/sounds/notification.mp3
+
+  fonts:
+    - family: Lobster
+      fonts:
+        - asset: assets/fonts/Lobster-Regular.ttf
+
+    - family: Montserrat
+      fonts:
+        - asset: assets/fonts/Montserrat-Regular.ttf
+        - asset: assets/fonts/Montserrat-SemiBold.ttf
+          weight: 600
+  uses-material-design: true
+  
+flutter_launcher_icons:
+  image_path: "assets/images/app_icon.png"
+  adaptive_icon_foreground: "assets/images/app_icon.png"
+  android: true
+  ios: true
+  remove_alpha_ios: true
+  image_path_ios: "assets/images/app_icon.png"
+
+flutter_native_splash:
+  android: true
+  ios: true
+  fullscreen: true
+  color: "#F58D1D"
+  image: assets/images/app_splash_screen.png
+  android_12:
+    image: assets/images/app_splash_screen.png
+    icon_background_color: "#F58D1D"

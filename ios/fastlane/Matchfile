@@ -1,0 +1,7 @@
+git_url("https://github.com/dineroo-gn/dineroo_mobile")
+
+storage_mode("git")
+
+type("appstore")
+
+app_identifier(["com.dineroo.app"])
